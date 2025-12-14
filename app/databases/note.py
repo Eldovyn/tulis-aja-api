@@ -18,7 +18,12 @@ class NoteDatabase(Database):
 
     @staticmethod
     async def delete(category, **kwargs):
-        pass
+        user_id = kwargs.get("user_id")
+        if category == "delete_note_by_user_id":
+            if user_data := UsersModel.objects(id=user_id).first():
+                if note_data := NoteModel.objects(user=user_data).first():
+                    note_data.delete()
+                    return note_data
 
     @staticmethod
     async def update(category, **kwargs):

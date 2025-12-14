@@ -9,6 +9,20 @@ class NoteController:
         self.note_serializer = NoteSerializer()
         self.note_ai = NoteAI()
 
+    async def delete_note(self, user, note_id):
+        note_data = await NoteDatabase.delete(
+            category="delete_note_by_user_id", note_id=note_id, user_id=f"{user.id}"
+        )
+        return (
+            jsonify(
+                {
+                    "message": "note deleted successfully.",
+                    "data": note_data,
+                }
+            ),
+            200,
+        )
+
     async def get_all_notes(self, user):
         note_data = await NoteDatabase.get(
             category="get_all_notes_by_user_id", user_id=f"{user.id}"

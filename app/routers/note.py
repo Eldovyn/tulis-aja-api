@@ -21,3 +21,10 @@ async def create_note():
 async def get_all_notes():
     user = request.user
     return await note_controller.get_all_notes(user)
+
+
+@note_router.delete("/<string:note_id>")
+@jwt_required()
+async def delete_note(note_id):
+    user = request.user
+    return await note_controller.delete_note(user, note_id)
