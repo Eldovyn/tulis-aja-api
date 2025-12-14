@@ -27,7 +27,21 @@ class NoteDatabase(Database):
 
     @staticmethod
     async def update(category, **kwargs):
-        pass
+        user_id = kwargs.get("user_id")
+        title = kwargs.get("title")
+        content = kwargs.get("content")
+        note_id = kwargs.get("note_id")
+        summary = kwargs.get("summary")
+        tags = kwargs.get("tags")
+        if category == "update_note_by_user_id":
+            if user_data := UsersModel.objects(id=user_id).first():
+                if note_data := NoteModel.objects(id=note_id).first():
+                    note_data.title = title
+                    note_data.content = content
+                    note_data.summary = summary
+                    note_data.tags = tags
+                    note_data.save()
+                    return note_data
 
     @staticmethod
     async def get(category, **kwargs):

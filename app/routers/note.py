@@ -28,3 +28,13 @@ async def get_all_notes():
 async def delete_note(note_id):
     user = request.user
     return await note_controller.delete_note(user, note_id)
+
+
+@note_router.patch("/<string:note_id>")
+@jwt_required()
+async def update_note(note_id):
+    user = request.user
+    json_data = request.json
+    title = json_data.get("title", "")
+    content = json_data.get("content", "")
+    return await note_controller.update_note(user, note_id, title, content)
