@@ -9,8 +9,6 @@ class NoteModel(BaseDocument):
     summary = me.StringField(required=True)
     tags = me.ListField(required=True)
 
-    user = me.ReferenceField(
-        UsersModel, required=True, unique=True, reverse_delete_rule=me.CASCADE
-    )
+    user = me.ReferenceField(UsersModel, required=True, reverse_delete_rule=me.CASCADE)
 
     meta = {"collection": "note"}

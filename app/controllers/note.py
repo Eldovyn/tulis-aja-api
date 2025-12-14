@@ -9,6 +9,24 @@ class NoteController:
         self.note_serializer = NoteSerializer()
         self.note_ai = NoteAI()
 
+    async def get_all_notes(self, user):
+        note_data = await NoteDatabase.get(
+            category="get_all_notes_by_user_id", user_id=f"{user.id}"
+        )
+        notes = []
+        for note in note_data:
+            note_serializer = self.note_serializer.serialize(note)
+            notes.append(note_serializer)
+        return (
+            jsonify(
+                {
+                    "message": "success get all notes",
+                    "data": notes,
+                }
+            ),
+            200,
+        )
+
     async def create_note(self, user, title, note):
         note_ai = self.note_ai.summarize_note(note)
         note_data = await NoteDatabase.insert(

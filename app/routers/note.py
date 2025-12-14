@@ -14,3 +14,10 @@ async def create_note():
     title = json_data.get("title", "")
     content = json_data.get("content", "")
     return await note_controller.create_note(user, title, content)
+
+
+@note_router.get("/")
+@jwt_required()
+async def get_all_notes():
+    user = request.user
+    return await note_controller.get_all_notes(user)

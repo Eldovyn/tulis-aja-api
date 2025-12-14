@@ -6,21 +6,14 @@ class NoteDatabase(Database):
     @staticmethod
     async def insert(user_id, title, note, summary, tags):
         if user_data := UsersModel.objects(id=user_id).first():
-            if note_data := NoteModel.objects(user=user_data).first():
-                note_data.title = title
-                note_data.content = note
-                note_data.summary = summary
-                note_data.tags = tags
-                note_data.save()
-            else:
-                note_data = NoteModel(
-                    user=user_data,
-                    title=title,
-                    content=note,
-                    summary=summary,
-                    tags=tags,
-                )
-                note_data.save()
+            note_data = NoteModel(
+                user=user_data,
+                title=title,
+                content=note,
+                summary=summary,
+                tags=tags,
+            )
+            note_data.save()
             return note_data
 
     @staticmethod
@@ -33,4 +26,8 @@ class NoteDatabase(Database):
 
     @staticmethod
     async def get(category, **kwargs):
-        pass
+        user_id = kwargs.get("user_id")
+        if category == "get_all_notes_by_user_id":
+            if user_data := UsersModel.objects(id=user_id).first():
+                if note_data := NoteModel.objects(user=user_data).all():
+                    return note_data

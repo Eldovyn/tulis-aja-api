@@ -10,6 +10,7 @@ class NoteSerializer(SerializerInterface):
         title_is_null: bool = False,
         content_is_null: bool = False,
         summary_is_null: bool = False,
+        tags_is_null: bool = False,
         created_at_is_null: bool = False,
         updated_at_is_null: bool = False,
         deleted_at_is_null: bool = False,
@@ -29,4 +30,6 @@ class NoteSerializer(SerializerInterface):
             data["updated_at"] = note.updated_at.isoformat()
         if not deleted_at_is_null and note.deleted_at:
             data["deleted_at"] = note.deleted_at.isoformat()
+        if not tags_is_null and note.tags:
+            data["tags"] = note.tags
         return data
