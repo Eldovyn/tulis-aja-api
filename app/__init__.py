@@ -49,10 +49,8 @@ def create_app(test_config=None):
     from .error_handlers import register_error_handlers
     from .middlewares import register_middlewares
     from .routers import register_blueprints
-    from .sockets import register_socket_io
 
     register_blueprints(app)
-    register_socket_io(socket_io)
     register_error_handlers(app)
     register_middlewares(app)
 

@@ -4,6 +4,7 @@ from ..utils import (
     Validation,
 )
 from ..serializers import UserSerializer
+import mongoengine as me
 
 
 class RegisterController:
@@ -48,15 +49,25 @@ class RegisterController:
                 ),
                 409,
             )
-        if provider != "google":
-            user_data = await UserDatabase.insert(
-                provider,
-                f"{avatar}",
-                username,
-                email,
-                result_password,
-            )
-            user_me = self.user_seliazer.serialize(user_data)
+        if provider == "auth_internal":
+            try:
+                user_data = await UserDatabase.insert(
+                    provider,
+                    avatar,
+                    username,
+                    email,
+                    result_password,
+                )
+                user_me = self.user_seliazer.serialize(user_data)
+            except me.errors.NotUniqueError:
+                return (
+                    jsonify(
+                        {
+                            "message": "the user already exists",
+                        }
+                    ),
+                    409,
+                )
         return (
             jsonify(
                 {
