@@ -1,0 +1,48 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Raka Santoso</title>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <style>
+      body { font-family: sans-serif; max-width: 720px; margin: 24px auto; }
+      #log { white-space: pre-wrap; border: 1px solid #ddd; padding: 12px; min-height: 200px; }
+    </style>
+  </head>
+  <body>
+    <div id="log"></div>
+    <form id="f">
+      <input id="msg" placeholder="Ketik jawaban..." style="width:80%" />
+      <button>Kirim</button>
+    </form>
+    <script>
+      const log = (t) => (document.getElementById('log').textContent += t + "\n");
+      const socket = io();
+
+      let assembling = "";
+
+      socket.on("system", (p) => log(`🔔 ${p.message}`));
+      socket.on("ai_delta", (p) => {
+        assembling += p.delta;
+        // render token-by-token (opsional: tampilkan di tempat khusus)
+      });
+      socket.on("ai_message_done", (p) => {
+        log("🤖 " + p.text);
+        assembling = "";
+      });
+      socket.on("session_ended", (p) => {
+        log(`📊 Sesi berakhir (${p.reason}).\n${p.score}`);
+      });
+      socket.on("error", (p) => log("⚠️ " + p.message));
+
+      document.getElementById("f").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const text = document.getElementById("msg").value;
+        if (!text) return;
+        log("🧑 " + text);
+        socket.emit("user_message", { text });
+        document.getElementById("msg").value = "";
+      });
+    </script>
+  </body>
+</html>
