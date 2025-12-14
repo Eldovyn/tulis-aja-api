@@ -5,6 +5,7 @@ from typing import List
 from pydantic import BaseModel, Field
 from google import genai
 from google.genai import types
+from ..config import gemini_api_key
 
 
 class NoteSummary(BaseModel):
@@ -28,7 +29,7 @@ class NoteAI:
     TAG_PATTERN = r"^[A-Za-z0-9]+(?:[ -][A-Za-z0-9]+)?$"
 
     def __init__(self, model: str = "gemini-2.5-flash"):
-        api_key = "AIzaSyA-0RYjDfbux5eib-Od7TfZ25OxYuPZ-AI"
+        api_key = gemini_api_key
         if not api_key:
             raise NoteSummaryConfigError(
                 "Missing GEMINI_API_KEY / GOOGLE_API_KEY env var."
@@ -39,12 +40,11 @@ class NoteAI:
         self._tag_re = re.compile(self.TAG_PATTERN)
 
     def _to_tag(self, s: str) -> str:
-        s = " ".join((s or "").strip().split()[:2])  # max 2 kata
-        s = re.sub(r"[^A-Za-z0-9 -]", "", s).strip()  # buang karakter aneh
+        s = " ".join((s or "").strip().split()[:2])
+        s = re.sub(r"[^A-Za-z0-9 -]", "", s).strip()
         return s if (s and self._tag_re.match(s)) else ""
 
     def _extract_json_text(self, text: str) -> str:
-        # fallback kalau balikin ```json ...``` atau ada noise
         if not text:
             return ""
         text = text.strip()
