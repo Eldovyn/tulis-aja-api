@@ -1,7 +1,7 @@
 from ..databases import NoteDatabase
 from ..serializers import NoteSerializer
 from flask import jsonify
-from ..utils import NoteAI
+from ..utils import NoteAI, NoteSummaryParseError
 
 
 class NoteController:
@@ -49,6 +49,16 @@ class NoteController:
         note_data = await NoteDatabase.get(
             category="get_all_notes_by_user_id", user_id=f"{user.id}"
         )
+        if not note_data:
+            return (
+                jsonify(
+                    {
+                        "message": "no notes found",
+                        "data": [],
+                    }
+                ),
+                200,
+            )
         notes = []
         for note in note_data:
             note_serializer = self.note_serializer.serialize(note)
@@ -64,7 +74,21 @@ class NoteController:
         )
 
     async def create_note(self, user, title, note):
-        note_ai = self.note_ai.summarize_note(note)
+        errors = {}
+        try:
+            note_ai = self.note_ai.summarize_note(note)
+        except NoteSummaryParseError:
+            errors.setdefault("note", []).append("IS_INVALID")
+        if errors:
+            return (
+                jsonify(
+                    {
+                        "message": "Failed to create note",
+                        "errors": errors,
+                    }
+                ),
+                422,
+            )
         note_data = await NoteDatabase.insert(
             user_id=f"{user.id}",
             title=title,
